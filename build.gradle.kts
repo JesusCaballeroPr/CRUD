@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation("org.postgresql:postgresql:42.6.0")
 }
 
 tasks.test {
