@@ -232,7 +232,6 @@ fun insertarNuevoRegistro() {
     ejecutarQuery(query)
 }
 
-
 fun modificarTodoRegistro() {
     val id = readInt("Ingrese el ID del registro a modificar:", "Debe ser un número")
     println("Ingrese los nuevos valores para el registro:")
@@ -284,7 +283,6 @@ fun eliminarRegistro() {
         println("Operación de eliminación cancelada.")
     }
 }
-
 
 fun ejecutarQuery(query: String) {
     try {
