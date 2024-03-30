@@ -3,6 +3,7 @@ package org.example.controller
 import org.example.GREEN_BOLD
 import org.example.RESET
 import org.example.readInt
+import org.example.readSentence
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -20,7 +21,6 @@ var connection = DriverManager.getConnection(url, usuario, password)
 var lisStament: Statement = connection.createStatement()
 
 fun main(){
-
     menu()
 }
 fun menu() {
@@ -119,8 +119,20 @@ fun menu() {
                 buscarDatosPorConsulta(consulta)
             }
             4 -> {
-                // Lógica para modificar datos
+                println("Seleccione la operación de modificación:")
+                println("1. Insertar de nuevo registro")
+                println("2. Modificar todo el registro existente")
+                println("3. Eliminar un registro existente")
+                val subOpciom = readInt("Ingrese su opción:", "Debe ser un número")
+
+                when (subOpciom) {
+                    1 -> insertarNuevoRegistro()
+                    2 -> modificarTodoRegistro()
+                    3 -> eliminarRegistro()
+                    else -> println("Opción no válida")
+                }
             }
+
             5 -> println("Saliendo...")
             else -> println("Opción no válida")
         }
@@ -191,4 +203,100 @@ fun verDatosPasarArchivo(resultado: ResultSet) {
     }
     println("Informe generado correctamente en la ruta $informeFile")
 }
+fun insertarNuevoRegistro() {
+    println("Ingrese los valores para el nuevo registro:")
+    val marca = readSentence("Ingrese la marca","Ha de ser letras")
+    val modelo = readSentence("Ingrese el modelo","Ha de ser letras")
+    val precio = readInt("Precio:", "Debe ser un número")
+    val rating = readInt("Puntuación:", "Debe ser un número")
+    val marcaProcesador = readSentence("INgrese marca del procesador", "Han de ser letras")
+    val tipoProcesador = readSentence("Ingrese el tipo de procesador","Han de ser letras")
+    val numeroCores = readInt("Número de cores:", "Debe ser un número")
+    val memoriaRAM = readInt("Cantidad de RAM:", "Debe ser un número")
+    val tipoAlmacenamiento = readSentence("Ingrese el tipo de almacenamiento","Han de ser letras")
+    val capacidadAlmacenamiento = readInt("Capacidad de almacenamiento:", "Debe ser un número")
+    val tipoGPU = readSentence("Ingrese el tipo de GPU","Han de ser letras")
+    val pulgadasPantalla = readInt("Tamaño de pantalla:", "Debe ser un número")
+    val resolucionAncho = readInt("Resolución de pantalla (ancho):", "Debe ser un número")
+    val resolucionAlto = readInt("Resolución de pantalla (alto):", "Debe ser un número")
+
+    val query = """
+        INSERT INTO laptops (brand, model, price, rating, processorbrand, processortier, 
+        numcores, rammemory, storagetype, storagecapacity, gputype, displaysize, 
+        resolutionwidth, resolutionheight) 
+        VALUES ('$marca', '$modelo', $precio, $rating, '$marcaProcesador', '$tipoProcesador', 
+        $numeroCores, $memoriaRAM, '$tipoAlmacenamiento', $capacidadAlmacenamiento, '$tipoGPU', 
+        $pulgadasPantalla, $resolucionAncho, $resolucionAlto)
+    """.trimIndent()
+
+    ejecutarQuery(query)
+}
+
+
+fun modificarTodoRegistro() {
+    val id = readInt("Ingrese el ID del registro a modificar:", "Debe ser un número")
+    println("Ingrese los nuevos valores para el registro:")
+    val marca = readSentence("Ingrese la marca","Ha de ser letras")
+    val modelo = readSentence("Ingrese el modelo","Ha de ser letras")
+    val precio = readInt("Precio:", "Debe ser un número")
+    val rating = readInt("Puntuación:", "Debe ser un número")
+    val marcaProcesador = readSentence("INgrese marca del procesador", "Han de ser letras")
+    val tipoProcesador = readSentence("Ingrese el tipo de procesador","Han de ser letras")
+    val numeroCores = readInt("Número de cores:", "Debe ser un número")
+    val memoriaRAM = readInt("Cantidad de RAM:", "Debe ser un número")
+    val tipoAlmacenamiento = readSentence("Ingrese el tipo de almacenamiento","Han de ser letras")
+    val capacidadAlmacenamiento = readInt("Capacidad de almacenamiento:", "Debe ser un número")
+    val tipoGPU = readSentence("Ingrese el tipo de GPU","Han de ser letras")
+    val pulgadasPantalla = readInt("Tamaño de pantalla:", "Debe ser un número")
+    val resolucionAncho = readInt("Resolución de pantalla (ancho):", "Debe ser un número")
+    val resolucionAlto = readInt("Resolución de pantalla (alto):", "Debe ser un número")
+
+    val query = """
+        UPDATE laptops SET 
+        brand='$marca', 
+        model='$modelo', 
+        price=$precio, 
+        rating=$rating, 
+        processorbrand='$marcaProcesador', 
+        processortier='$tipoProcesador', 
+        numcores=$numeroCores, 
+        rammemory=$memoriaRAM, 
+        storagetype='$tipoAlmacenamiento', 
+        storagecapacity=$capacidadAlmacenamiento, 
+        gputype='$tipoGPU', 
+        displaysize=$pulgadasPantalla, 
+        resolutionwidth=$resolucionAncho, 
+        resolutionheight=$resolucionAlto 
+        WHERE id=$id
+    """.trimIndent()
+
+    ejecutarQuery(query)
+}
+
+fun eliminarRegistro() {
+    val id = readInt("Ingrese el ID del registro a eliminar:", "Debe ser un número")
+
+    val confirmacion = readSentence("¿Está seguro que desea eliminar este registro? (Si/No): ","Debe ser una palabra")
+    if (confirmacion.equals("Si", ignoreCase = true)) {
+        val query = "DELETE FROM laptops WHERE id=$id"
+        ejecutarQuery(query)
+    } else {
+        println("Operación de eliminación cancelada.")
+    }
+}
+
+
+fun ejecutarQuery(query: String) {
+    try {
+        val resultado = lisStament.executeUpdate(query)
+        if (resultado > 0) {
+            println("Registro actualizado correctamente.")
+        } else {
+            println("No se encontró ningún registro para actualizar.")
+        }
+    } catch (e: Exception) {
+        println("Error al ejecutar la consulta: ${e.message}")
+    }
+}
+
 
