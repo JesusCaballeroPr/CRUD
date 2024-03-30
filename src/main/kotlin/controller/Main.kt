@@ -7,6 +7,8 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.Statement
+import java.io.File
+
 
 val url = "jdbc:postgresql://surus.db.elephantsql.com/"
 val usuario = "mkhwfgyy"
@@ -127,12 +129,12 @@ fun menu() {
 
 fun visualizarDatosOrdenadosPorCampo(query: String) {
     val resultadoOrdenado = extraerDatos(lisStament, query)
-    verDatos(resultadoOrdenado)
+    verDatosPasarArchivo(resultadoOrdenado)
 }
 
 fun buscarDatosPorConsulta(query: String) {
     val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
+    verDatosPasarArchivo(resultadoBusqueda)
 }
 
 fun conectarBBDD(url: String, usuario: String, password: String): Connection? {
@@ -156,67 +158,37 @@ fun extraerDatos(listStatement: Statement, query: String):ResultSet{
     var resultado:ResultSet=listStatement.executeQuery(query)
     return resultado
 }
-fun verDatos(resultado: ResultSet){
-    while (resultado.next()) {
-        var id = resultado.getInt("id")
-        var marca = resultado.getString("brand")
-        var modelo = resultado.getString("model")
-        var precio = resultado.getInt("price")
-        var rating=resultado.getInt("rating")
-        var marcaProcesador=resultado.getString("processorbrand")
-        var tipoProcesador=resultado.getString("processortier")
-        var numeroCores=resultado.getInt("numcores")
-        var memoriaRAM=resultado.getInt("rammemory")
-        var tipoAlmacenamiento=resultado.getString("storagetype")
-        var capacidadAlmacenamiento=resultado.getInt("storagecapacity")
-        var tipoGPU=resultado.getString("gputype")
-        var pulgadasPantalla=resultado.getInt("displaysize")
-        var resolucionAncho=resultado.getInt("resolutionwidth")
-        var resolucionAlto=resultado.getInt("resolutionheight")
-        println("$id - $marca - $modelo - $precio- $rating - $marcaProcesador - $tipoProcesador - $numeroCores" +
-                " - $memoriaRAM - $tipoAlmacenamiento - $capacidadAlmacenamiento - $tipoGPU - $pulgadasPantalla " +
-                "- $resolucionAncho - $resolucionAlto")
+
+fun verDatosPasarArchivo(resultado: ResultSet) {
+    val informeFile = File("src/main/kotlin/files/Informe.txt")
+
+    informeFile.bufferedWriter().use { out ->
+        while (resultado.next()) {
+            val id = resultado.getInt("id")
+            val marca = resultado.getString("brand")
+            val modelo = resultado.getString("model")
+            val precio = resultado.getInt("price")
+            val rating = resultado.getInt("rating")
+            val marcaProcesador = resultado.getString("processorbrand")
+            val tipoProcesador = resultado.getString("processortier")
+            val numeroCores = resultado.getInt("numcores")
+            val memoriaRAM = resultado.getInt("rammemory")
+            val tipoAlmacenamiento = resultado.getString("storagetype")
+            val capacidadAlmacenamiento = resultado.getInt("storagecapacity")
+            val tipoGPU = resultado.getString("gputype")
+            val pulgadasPantalla = resultado.getInt("displaysize")
+            val resolucionAncho = resultado.getInt("resolutionwidth")
+            val resolucionAlto = resultado.getInt("resolutionheight")
+
+            val linea = "$id - $marca - $modelo - $precio- $rating - $marcaProcesador - $tipoProcesador - $numeroCores" +
+                    " - $memoriaRAM - $tipoAlmacenamiento - $capacidadAlmacenamiento - $tipoGPU - $pulgadasPantalla " +
+                    "- $resolucionAncho - $resolucionAlto"
+            out.write(linea)
+            out.newLine()
+
+            println(linea)
+        }
     }
-}
-fun visualizarDatosOrdenadosPorCampo(campo: String, orden: String) {
-    val query = "SELECT * FROM laptops ORDER BY $campo $orden"
-    val resultadoOrdenado = extraerDatos(lisStament, query)
-    verDatos(resultadoOrdenado)
-}
-
-fun buscarPorMarca(marca: String) {
-    val query = "SELECT * FROM laptops WHERE brand='$marca'"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
-}
-
-fun buscarPorPrecioMaximo(precioMaximo: Int) {
-    val query = "SELECT * FROM laptops WHERE price <= $precioMaximo"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
-}
-
-fun buscarPorPuntuacionMinima(puntuacionMinima: Int) {
-    val query = "SELECT * FROM laptops WHERE rating >= $puntuacionMinima"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
-}
-
-fun buscarPorNumeroMinimoNucleos(numMinNucleos: Int) {
-    val query = "SELECT * FROM laptops WHERE numcores >= $numMinNucleos"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
-}
-
-fun buscarPorCantidadMinimaMemoriaRAM(minMemoriaRAM: Int) {
-    val query = "SELECT * FROM laptops WHERE rammemory >= $minMemoriaRAM"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
-}
-
-fun buscarPorTamanoPantalla(tamanoPantalla: Int) {
-    val query = "SELECT * FROM laptops WHERE displaysize = $tamanoPantalla"
-    val resultadoBusqueda = extraerDatos(lisStament, query)
-    verDatos(resultadoBusqueda)
+    println("Informe generado correctamente en la ruta $informeFile")
 }
 
